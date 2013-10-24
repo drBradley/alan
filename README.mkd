@@ -1,4 +1,66 @@
-alan
-====
+# alan
 
-R7RS Scheme program for running turing machines
+An R7RS Scheme program for running Turing machines.
+
+# Usage
+
+On the standard input put a description of:
+
+* the alphabet,
+* the state transition diagram,
+* the state of the tape.
+
+An example is:
+
+```
+"#+"
+(skip (stop)
+      (skip (#\# #\# -> stop)
+            (#\+ #\+ -> skip)))
+("+++#+" -1)
+```
+
+It consist of three s-expresions. The first is a string of two or more
+characters of which the first one is the one used to signify an empty
+position on the tape.
+
+The state transition diagram is described as a list whose first
+element is the name of the starting state. The second is the list of
+names of the ending states. Consequent elements describe the
+'intermediate' states.
+
+The description of an intermediate state consist of it's name and the
+descriptions of transitions from it to other states. A transistion in
+turn is a list of four elements:
+
+* the character that activates the transition upon being read,
+* the character to overwrite it with,
+* a left (`<-`) or right (`->`) pointing arrow signifying the
+direction in which we will move over the tape,
+* the name of the next state.
+
+Finally, we have a list containing a string describing the contents of
+the tape. It may optionally be followed by a number indicating how
+much and in which direction to shift over the tape with respect to the
+begining of the string.
+
+Given the example input from before the program will produce the
+following output:
+
+```
+Machine in state skip
+#+++#+
+^
+
+Machine in state stop
+#+++#+
+ ^
+```
+
+# Known issues
+
+The errors reported might not be very helpful.
+
+# Copying
+
+Copyright Bartosz Boguniewicz and Karol Marcjan 2013.
