@@ -64,3 +64,6 @@ The errors reported might not be very helpful.
 # Copying
 
 Copyright Bartosz Boguniewicz and Karol Marcjan 2013.
+
+You can find more information on the terms under which this software
+is provided in the `LICENSE` file distributed along with it.
