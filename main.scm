@@ -222,23 +222,33 @@
   (start std-start))
 
 (define log-machine-step (make-parameter
-                          (lambda (state-name tape) #f)))
+                          (lambda (state-name tape read written moved next-state) #f)))
 
 (define (run-machine diagram tape)
 
-  (let loop ((state (std-start diagram))
-             (tape tape))
+  (let ((log-func (log-machine-step))
+        (alphabet (tape-alphabet tape)))
 
-    ((log-machine-step) (machine-state-name state) tape)
-     
-    (if (end-state? state)
-        (values tape)
+    (let loop ((state (std-start diagram))
+               (tape tape))
 
-        (let* ((transition (choose-transition state tape))
-                        (next-state (transition-next-state transition))
-                        (next-tape (apply-transition transition tape)))
+      (let ((current (read-from-tape tape)))
 
-                   (loop next-state next-tape)))))
+        (if (end-state? state)
+            (values tape)
+
+            (let* ((transition (choose-transition state tape))
+                   (next-state (transition-next-state transition))
+                   (next-tape (apply-transition transition tape)))
+
+              (log-func (machine-state-name state)
+                        tape
+                        current
+                        (transition-write transition)
+                        (transition-move-direction transition)
+                        (machine-state-name next-state))
+
+              (loop next-state next-tape)))))))
 
 ;; Output
 
@@ -268,12 +278,23 @@
   (display (second-line tape))
   (newline))
 
-(define (log state-name tape) 
+(define (log state-name tape read written moved next-state) 
+
+  (display-tape tape)
 
   (display "Machine in state ")
   (display state-name)
+  (display ", read ")
+  (display read)
+  (display ", written ")
+  (display written)
+  (display ", moved ")
+  (display moved)
+  (display ". Transitioning to ")
+  (display next-state)
+  (display ".")
   (newline)
-  (display-tape tape)
+
   (newline))
 
 ;; Input
