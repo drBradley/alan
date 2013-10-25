@@ -160,7 +160,7 @@
   (make-transition write move next-state)
   transition?
   (write transition-write)
-  (move transition-move)
+  (move transition-move-direction)
   (next-state transition-next-state))
 
 (define (apply-transition transition tape)
@@ -169,6 +169,11 @@
         (write (transition-write transition)))
 
     (move (write-to-tape tape write))))
+
+(define (transition-move transition)
+  (if (eq? (transition-move-direction transition) '<-)
+      move-left
+      move-right))
 
 ;; Machine state type
 
@@ -331,10 +336,9 @@
 
         (move (let ((move-name (caddr trans-spec)))
 
-                (cond ((eq? '<- move-name) move-left)
-                      ((eq? '-> move-name) move-right)
-                      (else (error "transition-from-spec -- unknown move specifier"
-                                   move-name)))))
+                (if (not (or (eq? '<- move-name) (eq? '-> move-name)))
+                    (error "transition-from-spec -- unknown move specifier" move-name)
+                    move-name)))
 
         (next-state (find-state-named (list-ref trans-spec 3) states)))
 
